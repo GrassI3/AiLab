@@ -6,7 +6,6 @@ def IsValid(M, C, TotalM, TotalC):
     if (TotalM - M) > 0 and (TotalM - M) < (TotalC - C):
         return False
     return True
-
 def misCan_dfs(StartM, StartC):
     Visited = set()
     AllPaths = []
