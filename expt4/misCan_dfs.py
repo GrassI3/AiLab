@@ -39,7 +39,6 @@ if __name__ == "__main__":
                 print(f"\nPath {I}:")
                 for Step, (M, C, B) in enumerate(Path):
                     Side = "Left" if B == 0 else "Right"
-                    #print(f"  Step {Step}: L({M}M, {C}C) | Boat: {Side} | R({MCount-M}M, {CCount-C}C)")
                     print(f"  Step {Step}: ({M}M, {C}C," f" {'L' if B == 0 else 'R'})")
             print(f"\nTotal: {len(Result)}")
         else:
