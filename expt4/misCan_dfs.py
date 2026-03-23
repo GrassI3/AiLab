@@ -25,6 +25,8 @@ def misCan_dfs(StartM, StartC):
                 NewM, NewC, NewB = M + Dm, C + Dc, 0
             if IsValid(NewM, NewC, StartM, StartC):
                 Dfs(NewM, NewC, NewB, Path + [State])
+
+        Visited.remove(State)
     Dfs(StartM, StartC, 0, [])
     return AllPaths
 if __name__ == "__main__":
@@ -34,7 +36,7 @@ if __name__ == "__main__":
     else:
         Result = misCan_dfs(MCount, CCount)
         if Result:
-            print(f"\n{'='*20} MISSONARIES AND CANNIBALS DFS {'='*20}")
+            print(f"\n{'='*5} MISSONARIES AND CANNIBALS DFS {'='*5}")
             for I, Path in enumerate(Result, 1):
                 print(f"\nPath {I}:")
                 for Step, (M, C, B) in enumerate(Path):

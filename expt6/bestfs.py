@@ -21,7 +21,7 @@ def bestfs(start, goal, graph, heuristic):
                 break
             OPEN = ", ".join([f"({n.upper()}, {find_link(n)}, {h})" for h, n in sorted(queue)])
             CLOSED = ", ".join([f"({n.upper()}, {find_link(n)}, {heuristic[n]})" for n in visited])
-            print(f"{OPEN:<{75}} | {CLOSED}")
+            print(f"{OPEN:<{75}} | {CLOSED:<{75}}")
     path = []
     current = goal
     if current in visited:
