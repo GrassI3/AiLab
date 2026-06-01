@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laptop Diagnostics — Expert System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    * { font-family: 'Inter', sans-serif; }
+    body {
+      background: #0f0f13;
+      min-height: 100vh;
+    }
+    .glow-blue { box-shadow: 0 0 20px rgba(59,130,246,0.3); }
+    .glow-green { box-shadow: 0 0 20px rgba(34,197,94,0.25); }
+    .card-border {
+      background: linear-gradient(#1a1a24, #1a1a24) padding-box,
+                  linear-gradient(135deg, #3b82f6, #8b5cf6) border-box;
+      border: 1px solid transparent;
+    }
+    .option-btn {
+      transition: all 0.2s ease;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .option-btn:hover {
+      background: rgba(59,130,246,0.12);
+      border-color: rgba(59,130,246,0.5);
+      transform: translateX(4px);
+    }
+    .option-btn.selected {
+      background: rgba(59,130,246,0.2);
+      border-color: rgba(59,130,246,0.8);
+    }
+    .sev-low     { background: rgba(34,197,94,0.15);  color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
+    .sev-medium  { background: rgba(234,179,8,0.15);  color: #facc15; border: 1px solid rgba(234,179,8,0.3); }
+    .sev-high    { background: rgba(249,115,22,0.15); color: #fb923c; border: 1px solid rgba(249,115,22,0.3); }
+    .sev-critical{ background: rgba(239,68,68,0.15);  color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+    .conf-bar-bg { background: rgba(255,255,255,0.06); border-radius: 999px; overflow: hidden; }
+    .conf-bar-fill {
+      height: 6px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+      transition: width 0.6s ease;
+    }
+    .fade-in { animation: fadeIn 0.35s ease forwards; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+    #progress-bar { transition: width 0.5s ease; background: linear-gradient(90deg, #3b82f6, #8b5cf6); }
+    .dot-pulse span {
+      display: inline-block;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #3b82f6;
+      animation: dotPulse 1.2s infinite ease-in-out;
+      margin: 0 2px;
+    }
+    .dot-pulse span:nth-child(2) { animation-delay: 0.2s; }
+    .dot-pulse span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes dotPulse { 0%,80%,100% { transform:scale(0.6); opacity:0.4; } 40% { transform:scale(1); opacity:1; } }
+  </style>
+</head>
+<body class="text-white">
+  <header class="border-b border-white/5 px-6 py-4">
+    <div class="max-w-2xl mx-auto flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-blue-600/20 border border-blue-500/30 flex items-center justify-center">
+        <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+        </svg>
+      </div>
+      <div>
+        <h1 class="text-sm font-semibold text-white/90">Laptop Diagnostics</h1>
+        <p class="text-xs text-white/40">Expert System · Probability-based</p>
+      </div>
+    </div>
+  </header>
+  <main class="max-w-2xl mx-auto px-4 py-10">
+    <div id="start-screen" class="fade-in text-center">
+      <div class="mb-8">
+        <div class="w-20 h-20 mx-auto rounded-2xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center mb-6">
+          <svg class="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M9 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-4M9 3h10a2 2 0 012 2v4M9 3l6 6m0 0V3m0 6H9"/>
+          </svg>
+        </div>
+        <h2 class="text-2xl font-bold mb-3">What's wrong with your laptop?</h2>
+        <p class="text-white/50 text-sm leading-relaxed max-w-md mx-auto">
+          Answer a few targeted questions. The system adapts based on your answers
+          — no irrelevant questions, just straight to the decisive diagnosis.
+        </p>
+      </div>
+      <button id="start-btn" onclick="startDiag()"
+        class="px-8 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold transition-all duration-200 glow-blue">
+        Start Diagnosis →
+      </button>
+    </div>
+    <div id="progress-wrap" class="hidden mb-6">
+      <div class="flex justify-between text-xs text-white/40 mb-2">
+        <span id="progress-label">Analyzing…</span>
+        <span id="progress-count">0 / 0</span>
+      </div>
+      <div class="h-1 rounded-full bg-white/5 overflow-hidden">
+        <div id="progress-bar" class="h-full rounded-full" style="width:0%"></div>
+      </div>
+    </div>
+    <div id="question-area" class="hidden"></div>
+    <div id="loading" class="hidden text-center py-12">
+      <div class="dot-pulse mb-3"><span></span><span></span><span></span></div>
+      <p class="text-sm text-white/40">Thinking…</p>
+    </div>
+    <div id="results-area" class="hidden"></div>
+  </main>
+  <script>
+    let selectedAnswer = null;
+    async function startDiag() {
+      document.getElementById('start-screen').classList.add('hidden');
+      showLoading();
+      const res = await fetch('/api/start', { method: 'POST' });
+      const data = await res.json();
+      hideLoading();
+      document.getElementById('progress-wrap').classList.remove('hidden');
+      renderQuestion(data.question, { asked: 0, total: 1 });
+    }
+    function renderQuestion(q, progress) {
+      selectedAnswer = null;
+      const area = document.getElementById('question-area');
+      area.classList.remove('hidden');
+      if (progress) {
+        const pct = progress.total > 0 ? Math.round((progress.asked / progress.total) * 100) : 10;
+        document.getElementById('progress-bar').style.width = pct + '%';
+        document.getElementById('progress-label').textContent = 'Analyzing your answers…';
+        document.getElementById('progress-count').textContent = `${progress.asked} / ${progress.total}`;
+      }
+      area.innerHTML = `
+        <div class="card-border rounded-2xl p-6 fade-in">
+          <p class="text-xs text-blue-400 font-medium uppercase tracking-widest mb-3">Diagnostic Question</p>
+          <h2 class="text-lg font-semibold text-white mb-5 leading-snug">${q.text}</h2>
+          <div class="space-y-2" id="options-list">
+            ${q.options.map(opt => `
+              <button class="option-btn w-full text-left px-4 py-3 rounded-xl text-sm text-white/80"
+                data-val="${opt.value}" onclick="selectOption(this, '${opt.value}')">
+                <span class="inline-block w-2 h-2 rounded-full bg-white/20 mr-3 align-middle option-dot"></span>
+                ${opt.label}
+              </button>
+            `).join('')}
+          </div>
+          <div class="mt-5 flex justify-end">
+            <button id="next-btn" disabled onclick="submitAnswer('${q.id}')"
+              class="px-6 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold
+                     disabled:opacity-30 disabled:cursor-not-allowed hover:bg-blue-500
+                     transition-all duration-200">
+              Next →
+            </button>
+          </div>
+        </div>
+      `;
+    }
+    function selectOption(btn, val) {
+      document.querySelectorAll('.option-btn').forEach(b => {
+        b.classList.remove('selected');
+        b.querySelector('.option-dot').classList.remove('bg-blue-400');
+        b.querySelector('.option-dot').classList.add('bg-white/20');
+      });
+      btn.classList.add('selected');
+      btn.querySelector('.option-dot').classList.remove('bg-white/20');
+      btn.querySelector('.option-dot').classList.add('bg-blue-400');
+      selectedAnswer = val;
+      document.getElementById('next-btn').disabled = false;
+    }
+    async function submitAnswer(qid) {
+      if (!selectedAnswer) return;
+      showLoading();
+      document.getElementById('question-area').classList.add('hidden');
+      const res = await fetch('/api/answer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question_id: qid, answer: selectedAnswer })
+      });
+      const data = await res.json();
+      hideLoading();
+      if (data.done) {
+        document.getElementById('progress-wrap').classList.add('hidden');
+        showResults(data.diagnoses);
+      } else {
+        renderQuestion(data.question, data.progress);
+      }
+    }
+    function showResults(diagnoses) {
+      const area = document.getElementById('results-area');
+      area.classList.remove('hidden');
+      const sevLabel = { low: 'Low', medium: 'Medium', high: 'High', critical: 'Critical' };
+      const cards = diagnoses.map((d, i) => {
+        const isPrimary = i === 0;
+        return `
+          <div class="${isPrimary ? 'card-border' : 'border border-white/8 bg-white/[0.02]'} rounded-2xl p-5 fade-in" style="animation-delay:${i*0.1}s">
+            <div class="flex items-start justify-between mb-3">
+              <div>
+                ${isPrimary ? '<p class="text-xs text-blue-400 font-medium uppercase tracking-widest mb-1">Decisive Diagnosis</p>' : ''}
+                <h3 class="font-semibold text-white text-base">${d.label}</h3>
+              </div>
+              <span class="sev-${d.severity} text-xs font-medium px-2.5 py-1 rounded-lg ml-3 whitespace-nowrap">
+                ${sevLabel[d.severity]} severity
+              </span>
+            </div>
+            <p class="text-sm text-white/50 mb-3">${d.description}</p>
+            <div class="mb-4">
+              <div class="flex justify-between text-xs text-white/40 mb-1.5">
+                <span>Confidence</span><span>${d.confidence}%</span>
+              </div>
+              <div class="conf-bar-bg h-1.5">
+                <div class="conf-bar-fill" style="width:${d.confidence}%"></div>
+              </div>
+            </div>
+            <div class="bg-white/[0.03] rounded-xl p-4">
+              <p class="text-xs text-white/40 font-medium uppercase tracking-wider mb-2.5">How to fix</p>
+              <ul class="space-y-2">
+                ${d.fixes.map(f => `
+                  <li class="flex gap-2.5 text-sm text-white/70">
+                    <span class="text-blue-400 mt-0.5 shrink-0">›</span>
+                    <span>${f}</span>
+                  </li>
+                `).join('')}
+              </ul>
+            </div>
+          </div>
+        `;
+      }).join('');
+      area.innerHTML = `
+        <div class="fade-in">
+          <div class="flex items-center gap-2 mb-5">
+            <div class="w-2 h-2 rounded-full bg-green-400"></div>
+            <p class="text-sm font-medium text-white/70">Diagnosis complete</p>
+          </div>
+          <div class="space-y-4">${cards}</div>
+          <div class="mt-6 text-center">
+            <button onclick="location.reload()"
+              class="px-6 py-2.5 rounded-xl border border-white/10 text-sm text-white/60
+                     hover:border-white/20 hover:text-white/80 transition-all duration-200">
+              ← Start over
+            </button>
+          </div>
+          <p class="text-center text-xs text-white/25 mt-4">
+            This is a diagnostic aid, not professional repair advice. When in doubt, consult a technician.
+          </p>
+        </div>
+      `;
+    }
+    function showLoading() { document.getElementById('loading').classList.remove('hidden'); }
+    function hideLoading() { document.getElementById('loading').classList.add('hidden'); }
+  </script>
+</body>
+</html>

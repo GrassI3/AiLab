@@ -89,3 +89,38 @@ if __name__ == "__main__":
         print(f"\nFinal Result: {result}")
     else:
         print("No tree data was entered.")
+
+'''
+root L, R
+L LL, LR
+R RL, RR
+LL LLL, LLR
+LR LRL, LRR
+RL RLL, RLR
+RR RRL, RRR
+LLL a, b
+LLR c, d
+LRL e, f
+LRR g, h
+RLL i, j
+RLR k, l
+RRL m, n
+RRR o, p
+a 10
+b 5
+c 7
+d 11
+e 12
+f 8
+g 9
+h 8
+i 5
+j 12
+k 11
+l 12
+m 9
+n 8
+o 7
+p 10
+done
+'''
